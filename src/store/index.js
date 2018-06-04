@@ -1,185 +1,151 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import * as firebase from 'firebase'
+import {database} from '../main'
 
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    loadedMeetups: [],
-    user: null,
-    error: null,
     loading: false,
-  },
-  mutations: {
-    setLoadedMeetups(state, payload) {
-      state.loadedMeetups = payload
-    },
-    createMeetup(state, payload) {
-      state.loadedMeetups.push(payload)
-    },
-    setUser(state, payload) {
-      state.user = payload
-    },
-    setLoading(state, payload) {
-      state.loading = payload
-    },
-    setError(state, payload) {
-      state.error = payload
-    },
-    clearError(state) {
-      state.error = null
-    },
-  },
-  actions: {
-    logout({commit}) {
-      firebase.auth().signOut()
-      commit('setUser', null)
-    },
-    autoSignIn({commit}, payload) {
-      commit('setUser', {id: payload.uid, registeredMeetups: []})
-    },
-    loadMeetups({commit}) {
-      commit('setLoading', true);
-      firebase.database().ref('meetups').once('value')
-        .then((data) => {
-          const meetups = []
-          const obj = data.val()
-          for (let key in obj) {
-            meetups.push({
-              id: key,
-              title: obj[key].title,
-              description: obj[key].description,
-              imageUrl: obj[key].imageUrl,
-              date: obj[key].date,
-              creatorId: obj[key].creatorId,
-            })
-          }
-          commit('setLoadedMeetups', meetups)
-          commit('setLoading', false);
-        })
-        .catch((error) => {
-          console.log(error)
-          commit('setLoading', true);
-        })
-    },
-    createMeetup({commit}, payload) {
-      const meetup = {
-        title: payload.title,
-        location: payload.location,
-        description: payload.description,
-        date: payload.date.toISOString(),
-        creatorId: this.getters.user.id,
-      };
-      let imageUrl;
-      let key;
-      let ext;
-      firebase.database().ref('meetups').push(meetup)
-        .then((data) => {
-          console.log(data)
-          key = data.key
-          return key
-        })
-        .then(
-          key => {
-            const filename = payload.image.name
-            ext = filename.slice(filename.lastIndexOf('.'))
-            return firebase.storage().ref('meetups/' + key + ext).put(payload.image)
-          },
-        )
-        .then(
-          filedata => {
-            return filedata.ref.getDownloadURL()
-          },
-        )
-        .then(
-          url => {
-            imageUrl = url
-            return firebase.database().ref('meetups').child(key).update({
-              imageUrl: imageUrl,
-            })
-          },
-        )
-        .then(() => {
-            commit('createMeetup', {
-              ...meetup,
-              id: key,
-              imageUrl: imageUrl,
-            })
-          },
-        )
-        .catch((error) => console.log(error));
-    },
-    signUserUp({commit}, payload) {
-      commit('setLoading', true);
-      commit('clearError');
-      firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            commit('setLoading', false);
-            const newUser = {
-              id: user.uid,
-              registeredMeetups: [],
-            };
-            commit('setUser', newUser)
-          })
-        .catch(
-          error => {
-            console.log(error);
-            commit('setError', error);
-            commit('setLoading', false);
-          },
-        )
-    },
-    signUserIn({commit}, payload) {
-      commit('setLoading', true);
-      commit('clearError');
-      firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            commit('setLoading', false);
-            const newUser = {
-              id: user.uid,
-              registeredMeetups: [],
-            };
-            commit('setUser', newUser)
-          })
-        .catch(
-          error => {
-            console.log(error);
-            commit('setError', error);
-            commit('setLoading', false);
-          },
-        )
-    },
-    clearError({commit}) {
-      commit('clearError')
-    },
+    cider: {},
+    loadedShops: [],
+    loadedCiders: [],
   },
   getters: {
-    loadedMeetups(state) {
-      return state.loadedMeetups.sort((meetupA, meetupB) => {
-        return meetupA.date > meetupB.date
-      })
+    ciderPhoto(state) {
+      return state.cider.photo
     },
-    featuredMeetups(state, getters) {
-      return getters.loadedMeetups.slice(0, 5)
+    ciderTitle(state) {
+      return state.cider.title
     },
-    loadedMeetup(state) {
-      return (meetupId) => {
-        return state.loadedMeetups.find((meetup) => {
-          return meetup.id === meetupId
-        })
+    ciderDescription(state) {
+      return state.cider.description
+    },
+    ciderData(state) {
+      let data = state.cider
+      return {
+        'Производитель': data['developer'],
+        'Вкус': data['flavour'],
+        'Тара': data['container'],
+        'Объем': data['size'],
+        'Тип': data['type'],
       }
     },
-    user(state) {
-      return state.user
+    loadedShops(state) {
+      return state.loadedShops
     },
-    error(state) {
-      return state.error
+    loadedShopsForThisCider(state) {
+      return state.cider.shops
     },
-    loading(state) {
-      return state.loading
+    loadedCiders(state) {
+      return state.loadedCiders
+    },
+  },
+  mutations: {
+    addLoadedShop(state, payload) {
+      state.loadedShops.push(payload)
+    },
+    clearLoadedShopsForThisCider(state) {
+      state.cider.shops = []
+    },
+    addLoadedShopForThisCider(state, payload) {
+      state.cider.shops.push(payload)
+    },
+    getCider(state, payload) {
+      state.cider = payload
+    },
+    addCiderToLoadedCiders(state, payload) {
+      state.loadedCiders.push(payload)
+    },
+    clearLoadedCiders(state) {
+      state.loadedCiders = []
+    }
+  },
+  actions: {
+    addShop({commit}, payload) {
+      database.collection('shop')
+        .add(payload)
+        .catch(function (error) {
+          console.error('Error adding document: ', error);
+        });
+    },
+    getAllShops({commit}) {
+      database.collection('shop')
+        .get()
+        .then(data => {
+          data.forEach(doc => {
+              let data = doc.data()['title'] + ' - ' + doc.data()['address'];
+              commit('addLoadedShop', data)
+            },
+          )
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    },
+    getShopForThisCider({commit}, ciderId) {
+      commit('clearLoadedShopsForThisCider');
+      database.collection('cider').doc(ciderId)
+        .get()
+        .then(data => {
+          data.data()['shops'].forEach(shop => {
+            commit('addLoadedShopForThisCider', shop)
+          })
+        })
+    },
+    addShopForThisCider({commit}, payload) {
+      let ciderDocRef = database.collection('cider').doc(payload['ciderId'])
+      database.runTransaction(transaction => {
+        return transaction.get(ciderDocRef).then(ciderDoc => {
+          let shops = ciderDoc.data().shops
+          if (typeof shops === 'object') {
+            shops.push(payload['shop'])
+          } else {
+            shops = []
+            shops.push(payload['shop'])
+          }
+          transaction.update(ciderDocRef, {shops: shops});
+          return shops;
+        })
+      })
+    },
+    addCider({commit}, payload) {
+      database.collection('cider')
+        .add(payload)
+        .catch(error => {
+          console.log('Error while adding a new cider: ' + error)
+        })
+    },
+    getCider({commit}, ciderId) {
+      database.collection('cider').doc(ciderId)
+        .get()
+        .then(data => {
+          commit('getCider', data.data())
+
+        })
+    },
+    getAllCiders({commit}) {
+      commit('clearLoadedCiders');
+      database.collection('cider')
+        .get()
+        .then(data => {
+          data.forEach(doc => {
+            let data = {
+              alcohol: doc.data()['alcohol'],
+              container: doc.data()['container'],
+              description: doc.data()['description'],
+              developer: doc.data()['developer'],
+              flavour: doc.data()['flavour'],
+              photo: doc.data()['photo'],
+              ciderId: doc.id,
+              title: doc.data()['title'],
+              type: doc.data()['type']
+            }
+            commit('addCiderToLoadedCiders', data)
+          })
+        })
     },
   },
 })
+
+

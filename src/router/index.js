@@ -1,13 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
-import CreateMeetup from '@/components/Meetup/CreateMeetup'
-import Meetups from '@/components/Meetup/Meetups'
-import Meetup from '@/components/Meetup/Meetup'
-import Profile from '@/components/User/Profile'
-import Signin from '@/components/User/Signin'
-import Signup from '@/components/User/Signup'
-import AuthGuard from './auth-guard'
+import Cider from '@/components/Cider/Cider'
+import Shop from '@/components/Shop/Shop'
+import Shops from '@/components/Shop/Shops'
+import Ciders from '@/components/Cider/Ciders'
+import AddCider from '@/components/Cider/AddCider'
+import AddShop from '@/components/Shop/AddShop'
 
 Vue.use(Router)
 
@@ -16,40 +15,40 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
     },
     {
-      path: '/meetups',
-      name: 'Meetups',
-      component: Meetups
-    },
-    {
-      path: '/meetup/new',
-      name: 'CreateMeetup',
-      component: CreateMeetup,
-      beforeEnter: AuthGuard
-    },
-    {
-      path: '/meetups/:id',
-      name: 'Meetup',
+      path: '/cider/:id',
+      name: 'Cider',
+      component: Cider,
       props: true,
-      component: Meetup
     },
     {
-      path: '/profile',
-      name: 'Profile',
-      component: Profile
+      path: '/shop/:id',
+      name: 'Shop',
+      component: Shop,
+      props: true,
     },
     {
-      path: '/signup',
-      name: 'Signup',
-      component: Signup
+      path: '/cider',
+      component: Ciders,
+      name: 'Ciders',
     },
     {
-      path: '/signin',
-      name: 'Signin',
-      component: Signin
+      path: '/shop',
+      component: Shops,
+      name: 'Shops',
+    },
+    {
+      path: '/addcider',
+      component: AddCider,
+      name: 'AddCiders',
+    },
+    {
+      path: '/addshop',
+      component: AddShop,
+      name: 'AddShops',
     },
   ],
-  mode: 'history'
+  mode: 'history',
 })

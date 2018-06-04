@@ -1,7 +1,7 @@
 {
-  "name": "youtube-vuetify",
+  "name": "cider-nsk",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "region": "A Vue.js project",
   "author": "Artem Gainanov <Artem.Gainanov@jetbrains.com>",
   "private": true,
   "scripts": {

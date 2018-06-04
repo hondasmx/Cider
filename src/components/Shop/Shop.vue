@@ -1,11 +1,13 @@
 <template>
-  <v-container>
-    Hello world
+	<v-container>
+    hello Shop
   </v-container>
 </template>
 
 <script>
-  export default {}
+    export default {
+        name: 'Shop',
+    }
 </script>
 
 <style scoped>

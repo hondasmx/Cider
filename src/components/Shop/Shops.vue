@@ -1,12 +1,10 @@
 <template>
-    <div>
-      Profile
-    </div>
+	<v-layout>Shops</v-layout>
 </template>
 
 <script>
     export default {
-        name: 'Profile',
+        name: 'Shops',
     }
 </script>
 

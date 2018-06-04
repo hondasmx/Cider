@@ -1,25 +1,22 @@
 <template>
-  <v-app>
-
+  <v-app :dark=darkTheme>
     <v-toolbar>
       <v-toolbar-side-icon @click="sideNav = !sideNav" class="hidden-sm-and-up"></v-toolbar-side-icon>
       <v-toolbar-title>
-        <router-link to="/" tag="span" style="cursor: pointer">DevMeetup</router-link>
+        <router-link to="/" tag="span" style="cursor: pointer">Cider</router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-xs-only">
-        <v-btn flat v-for="item in menuItems" :key="item.title" router :to=item.link>
+        <v-btn flat v-for="item in menuItems" :key="item.title" router :to=item.link class="mr-4">
           <v-icon>
             {{item.icon}}
           </v-icon>
           {{item.title}}
         </v-btn>
-      </v-toolbar-items>
-      <v-toolbar-items class="hidden-xs-only" v-if="userIsIdentificated">
-        <v-btn flat @click="onLogout">
-          <v-icon>exit_to_app</v-icon>
-          Logout
-        </v-btn>
+        <v-container>
+          <v-switch v-model="darkTheme"></v-switch>
+        </v-container>
+
       </v-toolbar-items>
 
 
@@ -29,22 +26,6 @@
 
       </router-view>
     </main>
-    <v-navigation-drawer v-model="sideNav" temporary>
-      <v-list>
-        <v-list-tile v-for="item in menuItems" :key="item.title" router :to=item.link>
-          <v-list-tile-action>
-            <v-icon>{{item.icon}}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>{{item.title}}</v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="onLogout" v-if="userIsIdentificated">
-          <v-list-tile-action>
-            <v-icon>exit_to_app</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>Logout</v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
 
   </v-app>
 </template>
@@ -53,31 +34,17 @@
   export default {
     data() {
       return {
-        sideNav: false,
+        darkTheme: true,
       }
     },
     computed: {
       menuItems() {
-        let menu = [
-          {icon: 'face', title: 'Sign up', link: '/signup'},
-          {icon: 'lock_open', title: 'Sign in', link: '/signin'},
-        ];
-        if (this.userIsIdentificated) {
-          menu = [
-            {icon: 'supervisor_account', title: 'View meetups', link: '/meetups'},
-            {icon: 'room', title: 'Organize meetup', link: '/meetup/new'},
-            {icon: 'person', title: 'Profile', link: '/profile'},
-          ]
-        }
-        return menu
-      },
-      userIsIdentificated() {
-        return this.$store.getters.user !== null && this.$store.getters.user !== undefined
-      },
-    },
-    methods: {
-      onLogout() {
-        this.$store.dispatch('logout')
+        return [
+          {icon: 'store', title: 'Shops', link: '/shop'},
+          {icon: 'add_box', title: 'Add shop', link: '/addshop'},
+          {icon: 'favorite_border', title: 'Ciders', link: '/cider'},
+          {icon: 'add_circle', title: 'Add cider', link: '/addcider'},
+        ]
       },
     },
 
@@ -86,5 +53,5 @@
   }
 </script>
 <style lang="stylus">
-  @import './stylus/main'
+  @import './stylus/main.styl'
 </style>
