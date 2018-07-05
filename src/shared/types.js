@@ -3,6 +3,9 @@ export const flavourType = [
   'Грушевый',
   'Вишневый',
   'Смородиновый',
+  'Клубничный',
+  'Малиновый',
+  'Ягодный'
 ];
 
 export const containerType = [

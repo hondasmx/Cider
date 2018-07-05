@@ -12,6 +12,7 @@ import {
   VBtn,
   VCard,
   VCarousel,
+  VCheckbox,
   VDataTable,
   VDatePicker,
   VFooter,
@@ -20,17 +21,17 @@ import {
   VList,
   VNavigationDrawer,
   VProgressCircular,
+  VSelect,
   VSwitch,
   VTextField,
   VTimePicker,
   VToolbar,
   Vuetify,
-  VSelect,
-  VCheckbox
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
 import {store} from '@/store';
-import * as firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/firestore'
 
 Vue.use(Vuetify, {
   components: {
@@ -54,7 +55,7 @@ Vue.use(Vuetify, {
     VDataTable,
     VAvatar,
     VSelect,
-    VCheckbox
+    VCheckbox,
   },
 })
 
@@ -73,14 +74,16 @@ new Vue({
   template: '<App/>',
   created() {
     firebase.initializeApp({
-      apiKey: 'AIzaSyD0jIQ4c7o7u1SavnmrLdt4dVacNLzidTw',
-      authDomain: 'cider-48bcb.firebaseapp.com',
-      databaseURL: 'https://cider-48bcb.firebaseio.com',
-      projectId: 'cider-48bcb',
+      apiKey: '',
+      authDomain: '',
+      databaseURL: '',
+      projectId: '',
       storageBucket: '',
-      messagingSenderId: '764661581931',
+      messagingSenderId: '',
     })
     database = firebase.firestore();
+    const settings = {timestampsInSnapshots: true};
+    database.settings(settings)
     this.$store.dispatch('getAllShops')
     // db.collection('users').get().then(function (querySnapshot) {
     //   querySnapshot.forEach(doc => {

@@ -31,7 +31,7 @@
                           :size="150"
                           color="grey lighten-4"
                         >
-                          <img :src="cider.photo" alt="avatar">
+                          <img :src="cider.photoUrl" alt="avatar">
                         </v-avatar>
                       </v-flex>
                     </v-layout>
@@ -125,7 +125,6 @@
       }
     },
     created() {
-      this.$store.dispatch('getAllCiders');
       this.onCreateFlavour();
       this.onCreateCiderType();
     },

@@ -16,6 +16,7 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home,
+      redirect: '/cider'
     },
     {
       path: '/cider/:id',
@@ -50,5 +51,4 @@ export default new Router({
       name: 'AddShops',
     },
   ],
-  mode: 'history',
 })

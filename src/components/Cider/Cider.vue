@@ -1,6 +1,5 @@
 <template>
-  <v-container >
-    {{ciderData}}
+  <v-container v-if="ciderData">
     <v-layout row wrap class="mb-4">
       <v-flex xs3>
         <v-avatar
@@ -8,15 +7,15 @@
           :size="256"
           color="grey lighten-4"
         >
-          <img :src="this.$store.getters.ciderPhoto" alt="avatar">
+          <img :src="ciderPhoto" alt="avatar">
         </v-avatar>
       </v-flex>
 
       <v-flex xs9>
         <v-card>
-          <v-card-title><h4>{{this.$store.getters.ciderTitle}}</h4></v-card-title>
+          <v-card-title><h4>{{ciderTitle}}</h4></v-card-title>
           <v-list dense>
-            <v-list-tile v-for="(value, name) in ciderData" :key="name">
+            <v-list-tile v-for="(value, name) in ciderPreview" :key="name">
               <v-list-tile-content>{{name}}</v-list-tile-content>
               <v-list-tile-action>{{value}}</v-list-tile-action>
             </v-list-tile>
@@ -28,7 +27,7 @@
     <!--Описание-->
     <v-layout class="mb-4">
       <v-flex xs12>
-        {{this.$store.getters.ciderDescription}}
+        {{ciderDescription}}
       </v-flex>
     </v-layout>
 
@@ -82,6 +81,7 @@
 
 <script>
   export default {
+
     name: 'Cider',
     props: {
       id: {
@@ -107,15 +107,33 @@
     },
     computed: {
       ciderData() {
-        return this.$store.getters.ciderData
+        return this.$store.getters.ciderData(this.id)
+      },
+      ciderPreview() {
+        return {
+            'Производитель': this.ciderData['developer'],
+            'Вкус': this.ciderData['flavour'],
+            'Тара': this.ciderData['container'],
+            'Объем': this.ciderData['size'],
+            'Тип': this.ciderData['type'],
+          }
+      },
+      ciderTitle() {
+        return this.ciderData['title']
+      },
+      ciderDescription() {
+        return this.ciderData['description']
+      },
+      ciderPhoto() {
+        return this.ciderData['photoUrl']
       },
       loadedShopsForThisCider() {
-        return this.$store.getters.loadedShopsForThisCider
+        return this.ciderData['shops']
       },
     },
     created() {
-      this.$store.dispatch('getShopForThisCider', this.id)
-      this.$store.dispatch('getCider', this.id)
+      // this.$store.dispatch('getShopForThisCider', this.id)
+      // this.$store.dispatch('getCider', this.id)
     },
     data() {
       return {
@@ -134,6 +152,7 @@
         ],
         addShop_shop: '',
         addShop_cost: '',
+
       }
     },
 

@@ -47,6 +47,9 @@
         ]
       },
     },
+    created() {
+      this.$store.dispatch('getAllCiders')
+    },
 
     name: 'App',
 

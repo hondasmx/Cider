@@ -7,35 +7,18 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     loading: false,
-    cider: {},
     loadedShops: [],
     loadedCiders: [],
   },
   getters: {
-    ciderPhoto(state) {
-      return state.cider.photo
-    },
-    ciderTitle(state) {
-      return state.cider.title
-    },
-    ciderDescription(state) {
-      return state.cider.description
-    },
     ciderData(state) {
-      let data = state.cider
-      return {
-        'Производитель': data['developer'],
-        'Вкус': data['flavour'],
-        'Тара': data['container'],
-        'Объем': data['size'],
-        'Тип': data['type'],
-      }
+      return ciderId =>
+        state.loadedCiders.find((cider) => {
+          return cider.ciderId === ciderId
+        })
     },
     loadedShops(state) {
       return state.loadedShops
-    },
-    loadedShopsForThisCider(state) {
-      return state.cider.shops
     },
     loadedCiders(state) {
       return state.loadedCiders
@@ -45,21 +28,12 @@ export const store = new Vuex.Store({
     addLoadedShop(state, payload) {
       state.loadedShops.push(payload)
     },
-    clearLoadedShopsForThisCider(state) {
-      state.cider.shops = []
-    },
-    addLoadedShopForThisCider(state, payload) {
-      state.cider.shops.push(payload)
-    },
-    getCider(state, payload) {
-      state.cider = payload
-    },
     addCiderToLoadedCiders(state, payload) {
       state.loadedCiders.push(payload)
     },
     clearLoadedCiders(state) {
       state.loadedCiders = []
-    }
+    },
   },
   actions: {
     addShop({commit}, payload) {
@@ -81,16 +55,6 @@ export const store = new Vuex.Store({
         })
         .catch(error => {
           console.log(error);
-        })
-    },
-    getShopForThisCider({commit}, ciderId) {
-      commit('clearLoadedShopsForThisCider');
-      database.collection('cider').doc(ciderId)
-        .get()
-        .then(data => {
-          data.data()['shops'].forEach(shop => {
-            commit('addLoadedShopForThisCider', shop)
-          })
         })
     },
     addShopForThisCider({commit}, payload) {
@@ -116,14 +80,6 @@ export const store = new Vuex.Store({
           console.log('Error while adding a new cider: ' + error)
         })
     },
-    getCider({commit}, ciderId) {
-      database.collection('cider').doc(ciderId)
-        .get()
-        .then(data => {
-          commit('getCider', data.data())
-
-        })
-    },
     getAllCiders({commit}) {
       commit('clearLoadedCiders');
       database.collection('cider')
@@ -136,10 +92,12 @@ export const store = new Vuex.Store({
               description: doc.data()['description'],
               developer: doc.data()['developer'],
               flavour: doc.data()['flavour'],
-              photo: doc.data()['photo'],
+              photoUrl: doc.data()['photoUrl'],
               ciderId: doc.id,
               title: doc.data()['title'],
-              type: doc.data()['type']
+              type: doc.data()['type'],
+              size: doc.data()['size'],
+              shops: doc.data()['shops'],
             }
             commit('addCiderToLoadedCiders', data)
           })
